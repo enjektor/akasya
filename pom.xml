@@ -24,6 +24,13 @@
     <dependency>
       <groupId>com.github.enjektor</groupId>
       <artifactId>enjektor-context</artifactId>
+      <version>0.0.5.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.enjektor</groupId>
+      <artifactId>enjektor-core</artifactId>
+      <version>0.0.3.1</version>
     </dependency>
 
     <dependency>
