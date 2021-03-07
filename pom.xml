@@ -30,13 +30,13 @@
     <dependency>
       <groupId>com.github.enjektor</groupId>
       <artifactId>enjektor-context</artifactId>
-      <version>0.0.5.1</version>
+      <version>0.0.5.2</version>
     </dependency>
 
     <dependency>
       <groupId>com.github.enjektor</groupId>
       <artifactId>enjektor-core</artifactId>
-      <version>0.0.3.1</version>
+      <version>0.0.3.2</version>
     </dependency>
 
     <dependency>

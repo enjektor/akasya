@@ -6,12 +6,9 @@ import java.lang.reflect.Method;
 
 public class ServletInitializerTuple {
     private TByteObjectMap<TByteObjectMap<Method>> methods;
-    private String[][] endpoints;
 
-    public ServletInitializerTuple(final TByteObjectMap<TByteObjectMap<Method>> methods,
-                                   final String[][] endpoints) {
+    public ServletInitializerTuple(TByteObjectMap<TByteObjectMap<Method>> methods) {
         this.methods = methods;
-        this.endpoints = endpoints;
     }
 
     public TByteObjectMap<TByteObjectMap<Method>> getMethods() {
@@ -20,13 +17,5 @@ public class ServletInitializerTuple {
 
     public void setMethods(TByteObjectMap<TByteObjectMap<Method>> methods) {
         this.methods = methods;
-    }
-
-    public String[][] getEndpoints() {
-        return endpoints;
-    }
-
-    public void setEndpoints(String[][] endpoints) {
-        this.endpoints = endpoints;
     }
 }

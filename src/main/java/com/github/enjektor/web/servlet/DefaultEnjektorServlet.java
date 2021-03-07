@@ -1,28 +1,28 @@
 package com.github.enjektor.web.servlet;
 
+import com.github.enjektor.web.constants.EnjektorWebConstants;
 import com.github.enjektor.web.invocation.DefaultHttpInvocation;
 import com.github.enjektor.web.invocation.HttpInvocation;
 import gnu.trove.map.TByteObjectMap;
-import gnu.trove.map.hash.TByteObjectHashMap;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import static com.github.enjektor.web.constants.EnjektorWebConstants.HTTP_METHOD_GET;
-import static com.github.enjektor.web.constants.EnjektorWebConstants.HTTP_METHOD_POST;
-import static com.github.enjektor.web.constants.EnjektorWebConstants.HTTP_METHOD_DELETE;
-import static com.github.enjektor.web.constants.EnjektorWebConstants.HTTP_METHOD_PUT;
+public class DefaultEnjektorServlet extends HttpServlet implements EnjektorWebConstants {
 
-public class DefaultEnjektorServlet extends HttpServlet {
-
+    private static final byte HASH_KEY = 32;
     private final Object routerObject;
     private final Class<?> routerClass;
     private TByteObjectMap<TByteObjectMap<Method>> methods;
-    private String[][] endpoints;
+    private TByteObjectMap<Method> getMethods;
+    private TByteObjectMap<Method> postMethods;
+    private TByteObjectMap<Method> deleteMethods;
+    private TByteObjectMap<Method> putMethods;
 
     public DefaultEnjektorServlet(final Object routerObject,
                                   final Class<?> routerClass) {
@@ -35,7 +35,10 @@ public class DefaultEnjektorServlet extends HttpServlet {
         final HttpInvocation httpInvocation = new DefaultHttpInvocation();
         final ServletInitializerTuple servletInitializerTuple = httpInvocation.invoke(routerClass);
         methods = servletInitializerTuple.getMethods();
-        endpoints = servletInitializerTuple.getEndpoints();
+        getMethods = methods.get(HTTP_METHOD_GET);
+        postMethods = methods.get(HTTP_METHOD_POST);
+        deleteMethods = methods.get(HTTP_METHOD_DELETE);
+        putMethods = methods.get(HTTP_METHOD_PUT);
     }
 
     @Override
@@ -44,7 +47,14 @@ public class DefaultEnjektorServlet extends HttpServlet {
         final String servletPath = req.getServletPath();
         final String pathInfo = req.getPathInfo();
         final String fullPath = pathInfo != null ? servletPath + pathInfo : servletPath;
-//        final Method methodThatWillExecute = methods.get(HTTP_METHOD_GET).
+        final byte hashValue = unsignedHashValue(fullPath);
+        final Method methodThatWillExecute = getMethods.get(hashValue);
+        try {
+            final Object invoke = methodThatWillExecute.invoke(routerObject);
+            resp.getOutputStream().write(invoke.toString().getBytes());
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -60,5 +70,9 @@ public class DefaultEnjektorServlet extends HttpServlet {
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         super.doPut(req, resp);
+    }
+
+    private byte unsignedHashValue(String endpoint) {
+        return (byte) ((endpoint.hashCode() % HASH_KEY) & MASKING_VALUE);
     }
 }

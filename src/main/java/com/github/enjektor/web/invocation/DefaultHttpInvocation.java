@@ -1,26 +1,20 @@
 package com.github.enjektor.web.invocation;
 
 import com.github.enjektor.web.annotations.*;
+import com.github.enjektor.web.constants.EnjektorWebConstants;
 import com.github.enjektor.web.servlet.ServletInitializerTuple;
 import gnu.trove.map.TByteObjectMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
 
 import java.lang.reflect.Method;
 
-import static com.github.enjektor.web.constants.EnjektorWebConstants.HTTP_METHOD_GET;
-import static com.github.enjektor.web.constants.EnjektorWebConstants.HTTP_METHOD_POST;
-import static com.github.enjektor.web.constants.EnjektorWebConstants.HTTP_METHOD_DELETE;
-import static com.github.enjektor.web.constants.EnjektorWebConstants.HTTP_METHOD_PUT;
 
-public class DefaultHttpInvocation implements HttpInvocation {
-
-    private static final int METHOD_NUMBER = 4;
+public class DefaultHttpInvocation implements HttpInvocation, EnjektorWebConstants {
 
     @Override
     public ServletInitializerTuple invoke(final Class<?> routerClass) {
         final TByteObjectMap<TByteObjectMap<Method>> methodMap = new TByteObjectHashMap<>();
         final Method[] declaredMethods = routerClass.getDeclaredMethods();
-        final String[][] endpoints = new String[METHOD_NUMBER][declaredMethods.length];
 
         final Router router = routerClass.getAnnotation(Router.class);
         final String routerEndpoint = router.value().intern();
@@ -30,46 +24,38 @@ public class DefaultHttpInvocation implements HttpInvocation {
         final TByteObjectMap<Method> putMethods = new TByteObjectHashMap<>();
         final TByteObjectMap<Method> deleteMethods = new TByteObjectHashMap<>();
 
-        byte getCounter = 0;
-        byte postCounter = 0;
-        byte deleteCounter = 0;
-        byte putCounter = 0;
 
         for (final Method declaredMethod : declaredMethods) {
             final boolean isGet = declaredMethod.isAnnotationPresent(Get.class);
             if (isGet) {
                 final Get getAnnotation = declaredMethod.getAnnotation(Get.class);
                 final String endpointValue = routerEndpoint + getAnnotation.value();
-                endpoints[HTTP_METHOD_GET - 1][getCounter] = endpointValue;
-                getMethods.put(HTTP_METHOD_GET, declaredMethod);
-                getCounter++;
+                final byte hashValue = unsignedHashValue(endpointValue);
+                getMethods.put(hashValue, declaredMethod);
             }
 
             final boolean isPost = declaredMethod.isAnnotationPresent(Post.class);
             if (isPost) {
                 final Post postAnnotation = declaredMethod.getAnnotation(Post.class);
                 final String endpointValue = routerEndpoint + postAnnotation.value();
-                endpoints[HTTP_METHOD_POST - 1][postCounter] = endpointValue;
-                postMethods.put(HTTP_METHOD_POST, declaredMethod);
-                postCounter++;
+                final byte hashValue = unsignedHashValue(endpointValue);
+                postMethods.put(hashValue, declaredMethod);
             }
 
             final boolean isDelete = declaredMethod.isAnnotationPresent(Delete.class);
             if (isDelete) {
                 final Delete deleteAnnotation = declaredMethod.getAnnotation(Delete.class);
                 final String endpointValue = routerEndpoint + deleteAnnotation.value();
-                endpoints[HTTP_METHOD_DELETE - 1][deleteCounter] = endpointValue;
-                deleteMethods.put(HTTP_METHOD_DELETE, declaredMethod);
-                deleteCounter++;
+                final byte hashValue = unsignedHashValue(endpointValue);
+                deleteMethods.put(hashValue, declaredMethod);
             }
 
             final boolean isPut = declaredMethod.isAnnotationPresent(Put.class);
             if (isPut) {
                 final Put putAnnotation = declaredMethod.getAnnotation(Put.class);
                 final String endpointValue = routerEndpoint + putAnnotation.value();
-                endpoints[HTTP_METHOD_PUT - 1][putCounter] = endpointValue;
-                putMethods.put(HTTP_METHOD_PUT, declaredMethod);
-                putCounter++;
+                final byte hashValue = unsignedHashValue(endpointValue);
+                putMethods.put(hashValue, declaredMethod);
             }
         }
 
@@ -78,7 +64,11 @@ public class DefaultHttpInvocation implements HttpInvocation {
         methodMap.put(HTTP_METHOD_DELETE, deleteMethods);
         methodMap.put(HTTP_METHOD_PUT, putMethods);
 
-        return new ServletInitializerTuple(methodMap, endpoints);
+        return new ServletInitializerTuple(methodMap);
+    }
+
+    private byte unsignedHashValue(String endpoint) {
+        return (byte) ((endpoint.hashCode() % HASH_KEY) & MASKING_VALUE);
     }
 
 }
