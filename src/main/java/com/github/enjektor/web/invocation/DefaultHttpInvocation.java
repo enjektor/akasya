@@ -1,19 +1,27 @@
 package com.github.enjektor.web.invocation;
 
-import com.github.enjektor.web.annotations.*;
-import com.github.enjektor.web.constants.EnjektorWebConstants;
-import com.github.enjektor.web.servlet.ServletInitializerTuple;
+import com.github.enjektor.web.annotations.Delete;
+import com.github.enjektor.web.annotations.Get;
+import com.github.enjektor.web.annotations.Post;
+import com.github.enjektor.web.annotations.Put;
+import com.github.enjektor.web.annotations.Router;
 import gnu.trove.map.TByteObjectMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
 
 import java.lang.reflect.Method;
 
+import static com.github.enjektor.web.constants.EnjektorWebConstants.HASH_KEY;
+import static com.github.enjektor.web.constants.EnjektorWebConstants.HTTP_METHOD_DELETE;
+import static com.github.enjektor.web.constants.EnjektorWebConstants.HTTP_METHOD_GET;
+import static com.github.enjektor.web.constants.EnjektorWebConstants.HTTP_METHOD_POST;
+import static com.github.enjektor.web.constants.EnjektorWebConstants.HTTP_METHOD_PUT;
+import static com.github.enjektor.web.constants.EnjektorWebConstants.MASKING_VALUE;
 
-public class DefaultHttpInvocation implements HttpInvocation, EnjektorWebConstants {
+public class DefaultHttpInvocation implements HttpInvocation {
 
     @Override
-    public ServletInitializerTuple invoke(final Class<?> routerClass) {
-        final TByteObjectMap<TByteObjectMap<Method>> methodMap = new TByteObjectHashMap<>();
+    public TByteObjectMap<Method>[] invoke(final Class<?> routerClass) {
+        final TByteObjectMap<Method>[] methodArray = new TByteObjectMap[4];
         final Method[] declaredMethods = routerClass.getDeclaredMethods();
 
         final Router router = routerClass.getAnnotation(Router.class);
@@ -23,7 +31,6 @@ public class DefaultHttpInvocation implements HttpInvocation, EnjektorWebConstan
         final TByteObjectMap<Method> postMethods = new TByteObjectHashMap<>();
         final TByteObjectMap<Method> putMethods = new TByteObjectHashMap<>();
         final TByteObjectMap<Method> deleteMethods = new TByteObjectHashMap<>();
-
 
         for (final Method declaredMethod : declaredMethods) {
             final boolean isGet = declaredMethod.isAnnotationPresent(Get.class);
@@ -59,12 +66,12 @@ public class DefaultHttpInvocation implements HttpInvocation, EnjektorWebConstan
             }
         }
 
-        methodMap.put(HTTP_METHOD_GET, getMethods);
-        methodMap.put(HTTP_METHOD_POST, postMethods);
-        methodMap.put(HTTP_METHOD_DELETE, deleteMethods);
-        methodMap.put(HTTP_METHOD_PUT, putMethods);
+        methodArray[HTTP_METHOD_GET] = getMethods;
+        methodArray[HTTP_METHOD_POST] = postMethods;
+        methodArray[HTTP_METHOD_DELETE] = deleteMethods;
+        methodArray[HTTP_METHOD_PUT] = putMethods;
 
-        return new ServletInitializerTuple(methodMap);
+        return methodArray;
     }
 
     private byte unsignedHashValue(String endpoint) {
