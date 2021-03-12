@@ -1,7 +1,9 @@
 package com.github.enjektor.web.invocation;
 
-import com.github.enjektor.web.servlet.ServletInitializerTuple;
+import gnu.trove.map.TByteObjectMap;
+
+import java.lang.reflect.Method;
 
 public interface HttpInvocation {
-    ServletInitializerTuple invoke(Class<?> routerClass);
+    TByteObjectMap<Method>[] invoke(Class<?> routerClass);
 }
