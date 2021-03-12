@@ -3,6 +3,8 @@ package com.github.enjektor.web.servlet;
 import com.github.enjektor.web.constants.EnjektorWebConstants;
 import com.github.enjektor.web.invocation.DefaultHttpInvocation;
 import com.github.enjektor.web.invocation.HttpInvocation;
+import com.github.enjektor.web.policy.EndpointNamingPolicy;
+import com.github.enjektor.web.policy.EndpointNamingPolicyImpl;
 import gnu.trove.map.TByteObjectMap;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -23,11 +25,13 @@ public class DefaultEnjektorServlet extends HttpServlet implements EnjektorWebCo
     private TByteObjectMap<Method> postMethods;
     private TByteObjectMap<Method> deleteMethods;
     private TByteObjectMap<Method> putMethods;
+    private EndpointNamingPolicy endpointNamingPolicy;
 
     public DefaultEnjektorServlet(final Object routerObject,
                                   final Class<?> routerClass) {
         this.routerObject = routerObject;
         this.routerClass = routerClass;
+        this.endpointNamingPolicy = EndpointNamingPolicyImpl.getInstance();
     }
 
     @Override
@@ -47,7 +51,8 @@ public class DefaultEnjektorServlet extends HttpServlet implements EnjektorWebCo
         final String servletPath = req.getServletPath();
         final String pathInfo = req.getPathInfo();
         final String fullPath = pathInfo != null ? servletPath + pathInfo : servletPath;
-        final byte hashValue = unsignedHashValue(fullPath);
+        final String committedPath = endpointNamingPolicy.erase(fullPath);
+        final byte hashValue = unsignedHashValue(committedPath);
         final Method methodThatWillExecute = getMethods.get(hashValue);
         try {
             final Object invoke = methodThatWillExecute.invoke(routerObject);
