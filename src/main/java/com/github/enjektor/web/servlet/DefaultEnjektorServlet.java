@@ -17,29 +17,27 @@ public class DefaultEnjektorServlet extends HttpServlet {
 
     private final Object routerObject;
     private final Class<?> routerClass;
-    private EndpointNamingPolicy endpointNamingPolicy;
     private TByteObjectMap<Method>[] methods;
 
     public DefaultEnjektorServlet(final Object routerObject,
                                   final Class<?> routerClass) {
         this.routerObject = routerObject;
         this.routerClass = routerClass;
-        this.endpointNamingPolicy = EndpointNamingPolicyImpl.getInstance();
     }
 
     @Override
     public void init() throws ServletException {
-        final HttpInvocation httpInvocation = new DefaultHttpInvocation();
-        methods = httpInvocation.invoke(routerClass);
+        final ServletInitializer servletInitializer = new DefaultServletInitializer();
+        methods = servletInitializer.initialize(routerClass);
     }
 
     @Override
     protected void doGet(final HttpServletRequest req,
                          final HttpServletResponse resp) throws ServletException, IOException {
-        final String servletPath = req.getServletPath();
-        final String pathInfo = req.getPathInfo();
-        final String fullPath = pathInfo != null ? servletPath + pathInfo : servletPath;
-        final String committedPath = endpointNamingPolicy.erase(fullPath);
+//        final String servletPath = req.getServletPath();
+//        final String pathInfo = req.getPathInfo();
+//        final String fullPath = pathInfo != null ? servletPath + pathInfo : servletPath;
+//        final String committedPath = endpointNamingPolicy.erase(fullPath);
 //        final byte hashValue = unsignedHashValue(committedPath);
 //        final Method methodThatWillExecute = methods[HTTP_METHOD_GET].get(hashValue);
 //        try {
