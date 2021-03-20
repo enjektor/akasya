@@ -11,12 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
-import static com.github.enjektor.web.constants.WebConstants.HASH_KEY;
-import static com.github.enjektor.web.constants.WebConstants.HTTP_METHOD_GET;
-import static com.github.enjektor.web.constants.WebConstants.MASKING_VALUE;
 
 public class DefaultEnjektorServlet extends HttpServlet {
 
