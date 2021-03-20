@@ -14,9 +14,9 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import static com.github.enjektor.web.constants.EnjektorWebConstants.HASH_KEY;
-import static com.github.enjektor.web.constants.EnjektorWebConstants.HTTP_METHOD_GET;
-import static com.github.enjektor.web.constants.EnjektorWebConstants.MASKING_VALUE;
+import static com.github.enjektor.web.constants.WebConstants.HASH_KEY;
+import static com.github.enjektor.web.constants.WebConstants.HTTP_METHOD_GET;
+import static com.github.enjektor.web.constants.WebConstants.MASKING_VALUE;
 
 public class DefaultEnjektorServlet extends HttpServlet {
 
@@ -45,14 +45,14 @@ public class DefaultEnjektorServlet extends HttpServlet {
         final String pathInfo = req.getPathInfo();
         final String fullPath = pathInfo != null ? servletPath + pathInfo : servletPath;
         final String committedPath = endpointNamingPolicy.erase(fullPath);
-        final byte hashValue = unsignedHashValue(committedPath);
-        final Method methodThatWillExecute = methods[HTTP_METHOD_GET].get(hashValue);
-        try {
-            final Object invoke = methodThatWillExecute.invoke(routerObject);
-            resp.getOutputStream().write(invoke.toString().getBytes());
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
+//        final byte hashValue = unsignedHashValue(committedPath);
+//        final Method methodThatWillExecute = methods[HTTP_METHOD_GET].get(hashValue);
+//        try {
+//            final Object invoke = methodThatWillExecute.invoke(routerObject);
+//            resp.getOutputStream().write(invoke.toString().getBytes());
+//        } catch (IllegalAccessException | InvocationTargetException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Override
@@ -70,7 +70,4 @@ public class DefaultEnjektorServlet extends HttpServlet {
         super.doPut(req, resp);
     }
 
-    private byte unsignedHashValue(String endpoint) {
-        return (byte) ((endpoint.hashCode() % HASH_KEY) & MASKING_VALUE);
-    }
 }

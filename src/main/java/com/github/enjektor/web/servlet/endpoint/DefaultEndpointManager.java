@@ -1,5 +1,7 @@
 package com.github.enjektor.web.servlet.endpoint;
 
+import com.github.enjektor.web.servlet.endpoint.hash.ByteHashProvider;
+import com.github.enjektor.web.servlet.endpoint.hash.HashProvider;
 import com.github.enjektor.web.servlet.endpoint.information.DefaultEndpointInformation;
 import com.github.enjektor.web.servlet.endpoint.information.EndpointInformation;
 import gnu.trove.map.TByteObjectMap;
@@ -10,10 +12,13 @@ import java.lang.reflect.Method;
 public class DefaultEndpointManager implements EndpointManager {
 
     private final EndpointInformation<String> endpointInformation;
+    private final HashProvider hashProvider;
     private TByteObjectMap<Method>[] methods;
 
-    public DefaultEndpointManager() {
+    public DefaultEndpointManager(final TByteObjectMap<Method>[] methods) {
         this.endpointInformation = DefaultEndpointInformation.getInstance();
+        this.hashProvider = ByteHashProvider.getInstance();
+        this.methods = methods;
     }
 
     @Override
