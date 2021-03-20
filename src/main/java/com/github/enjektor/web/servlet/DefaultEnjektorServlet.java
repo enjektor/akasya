@@ -1,7 +1,7 @@
 package com.github.enjektor.web.servlet;
 
-import com.github.enjektor.web.invocation.DefaultHttpInvocation;
-import com.github.enjektor.web.invocation.HttpInvocation;
+import com.github.enjektor.web.invocation.http.DefaultHttpInvocation;
+import com.github.enjektor.web.invocation.http.HttpInvocation;
 import com.github.enjektor.web.policy.EndpointNamingPolicy;
 import com.github.enjektor.web.policy.EndpointNamingPolicyImpl;
 import gnu.trove.map.TByteObjectMap;
@@ -15,10 +15,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import static com.github.enjektor.web.constants.EnjektorWebConstants.HASH_KEY;
-import static com.github.enjektor.web.constants.EnjektorWebConstants.HTTP_METHOD_DELETE;
 import static com.github.enjektor.web.constants.EnjektorWebConstants.HTTP_METHOD_GET;
-import static com.github.enjektor.web.constants.EnjektorWebConstants.HTTP_METHOD_POST;
-import static com.github.enjektor.web.constants.EnjektorWebConstants.HTTP_METHOD_PUT;
 import static com.github.enjektor.web.constants.EnjektorWebConstants.MASKING_VALUE;
 
 public class DefaultEnjektorServlet extends HttpServlet {
