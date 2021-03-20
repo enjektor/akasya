@@ -1,10 +1,11 @@
-package com.github.enjektor.web.invocation;
+package com.github.enjektor.web.invocation.http;
 
 import com.github.enjektor.web.annotations.Delete;
 import com.github.enjektor.web.annotations.Get;
 import com.github.enjektor.web.annotations.Post;
 import com.github.enjektor.web.annotations.Put;
 import com.github.enjektor.web.annotations.Router;
+import com.github.enjektor.web.invocation.http.HttpInvocation;
 import gnu.trove.map.TByteObjectMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
 

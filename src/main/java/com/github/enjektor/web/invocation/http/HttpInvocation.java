@@ -1,4 +1,4 @@
-package com.github.enjektor.web.invocation;
+package com.github.enjektor.web.invocation.http;
 
 import gnu.trove.map.TByteObjectMap;
 
