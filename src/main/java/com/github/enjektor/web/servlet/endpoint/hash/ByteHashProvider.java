@@ -1,7 +1,7 @@
 package com.github.enjektor.web.servlet.endpoint.hash;
 
-import static com.github.enjektor.web.constants.WebConstants.HASH_KEY;
-import static com.github.enjektor.web.constants.WebConstants.MASKING_VALUE;
+import static com.github.enjektor.web.WebConstants.HASH_KEY;
+import static com.github.enjektor.web.WebConstants.MASKING_VALUE;
 
 public class ByteHashProvider implements HashProvider {
 

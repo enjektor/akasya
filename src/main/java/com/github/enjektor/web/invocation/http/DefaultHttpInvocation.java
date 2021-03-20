@@ -10,12 +10,12 @@ import gnu.trove.map.hash.TByteObjectHashMap;
 
 import java.lang.reflect.Method;
 
-import static com.github.enjektor.web.constants.WebConstants.HASH_KEY;
-import static com.github.enjektor.web.constants.WebConstants.HTTP_METHOD_DELETE;
-import static com.github.enjektor.web.constants.WebConstants.HTTP_METHOD_GET;
-import static com.github.enjektor.web.constants.WebConstants.HTTP_METHOD_POST;
-import static com.github.enjektor.web.constants.WebConstants.HTTP_METHOD_PUT;
-import static com.github.enjektor.web.constants.WebConstants.MASKING_VALUE;
+import static com.github.enjektor.web.WebConstants.HASH_KEY;
+import static com.github.enjektor.web.WebConstants.HTTP_METHOD_DELETE;
+import static com.github.enjektor.web.WebConstants.HTTP_METHOD_GET;
+import static com.github.enjektor.web.WebConstants.HTTP_METHOD_POST;
+import static com.github.enjektor.web.WebConstants.HTTP_METHOD_PUT;
+import static com.github.enjektor.web.WebConstants.MASKING_VALUE;
 
 public class DefaultHttpInvocation implements HttpInvocation {
 

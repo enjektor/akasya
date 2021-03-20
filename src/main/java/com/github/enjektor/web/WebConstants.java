@@ -1,4 +1,4 @@
-package com.github.enjektor.web.constants;
+package com.github.enjektor.web;
 
 public class WebConstants {
 
