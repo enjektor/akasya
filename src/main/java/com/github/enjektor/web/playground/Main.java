@@ -15,13 +15,13 @@ import org.eclipse.jetty.servlet.ServletHolder;
 
 import java.util.List;
 
-public class ExampleApplication {
+public class Main {
     public static void main(String[] args) throws Exception {
         final DependencyInitializer dependencyInitializer = new DefaultDependencyInitializer();
         final DependencyInitializer webDependencyInitializer = new WebDependencyInitializer();
         final List<DependencyInitializer> dependencyInitializers = ImmutableList.of(dependencyInitializer, webDependencyInitializer);
 
-        final ApplicationContext applicationContext = new PrimitiveApplicationContext(ExampleApplication.class, dependencyInitializers);
+        final ApplicationContext applicationContext = new PrimitiveApplicationContext(Main.class, dependencyInitializers);
         final ExampleRouter bean = applicationContext.getBean(ExampleRouter.class);
 
         EnjektorServlet defaultEnjektorServlet = new EnjektorServlet(bean, ExampleRouter.class);
