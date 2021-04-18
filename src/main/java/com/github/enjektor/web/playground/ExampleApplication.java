@@ -1,4 +1,4 @@
-package com.github.enjektor.web.tut;
+package com.github.enjektor.web.playground;
 
 import com.github.enjektor.context.ApplicationContext;
 import com.github.enjektor.context.PrimitiveApplicationContext;
@@ -42,5 +42,6 @@ public class ExampleApplication {
         servletHandler.addServletWithMapping(holderOne, "/v1/*");
 
         server.start();
+        System.gc();
     }
 }
