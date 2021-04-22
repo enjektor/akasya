@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 import static com.github.enjektor.web.WebConstants.HTTP_METHOD_GET;
 import static com.github.enjektor.web.WebConstants.HTTP_METHOD_POST;
@@ -22,17 +23,19 @@ public class DefaultEndpointManager implements EndpointManager {
     private final EndpointInformation<String> endpointInformation;
     private final HashProvider hashProvider;
     private final InvocationHandler invocationHandler;
-    private final TByteObjectMap<MethodState>[] methods;
+    private final TByteObjectMap<MethodState> methods;
+    private final MethodState GET_STATE;
     private final Object routerObject;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public DefaultEndpointManager(final Object routerObject,
-                                  final TByteObjectMap<MethodState>[] methods) {
+                                  final TByteObjectMap<MethodState> methods) {
         this.routerObject = routerObject;
         this.invocationHandler = InvocationHandlerImpl.getInstance();
         this.endpointInformation = DefaultEndpointInformation.getInstance();
         this.hashProvider = ByteHashProvider.getInstance();
         this.methods = methods;
+        this.GET_STATE = methods.get(HTTP_METHOD_GET);
     }
 
     private short weight(String endpoint) {
@@ -53,16 +56,30 @@ public class DefaultEndpointManager implements EndpointManager {
          */
 
         final byte unsignedHashValue = hashProvider.provide(endpoint);
-        final Method methodThatWillExecute = methods[HTTP_METHOD_GET].get(unsignedHashValue).getMethod();
-        invocationHandler.invoke(routerObject, methodThatWillExecute, res);
+
+        final Method methodThatWillExecute = GET_STATE.getMethods().get(unsignedHashValue);
+
+        if (methodThatWillExecute == null) {
+            List<String> patterns = GET_STATE.getPatterns();
+            for (String pattern : patterns) {
+                if (endpoint.matches(pattern)) {
+                    byte hashRegex = hashProvider.provide(pattern);
+                    final Method method = GET_STATE.getMethods().get(hashRegex);
+                    invocationHandler.invoke(routerObject, method, res);
+                }
+            }
+        } else {
+            invocationHandler.invoke(routerObject, methodThatWillExecute, res);
+        }
+
     }
 
     @Override
     public void managePost(HttpServletRequest req, HttpServletResponse res) {
-        final String endpoint = endpointInformation.collectInformation(req);
-        final byte unsignedHashValue = hashProvider.provide(endpoint);
-        final Method methodThatWillExecute = methods[HTTP_METHOD_POST].get(unsignedHashValue).getMethod();
-        invocationHandler.invoke(routerObject, methodThatWillExecute, req, res);
+//        final String endpoint = endpointInformation.collectInformation(req);
+//        final byte unsignedHashValue = hashProvider.provide(endpoint);
+//        final Method methodThatWillExecute = methods[HTTP_METHOD_POST].get(unsignedHashValue).getMethod();
+//        invocationHandler.invoke(routerObject, methodThatWillExecute, req, res);
     }
 
     @Override

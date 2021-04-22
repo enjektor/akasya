@@ -5,5 +5,5 @@ import gnu.trove.map.TByteObjectMap;
 
 
 public interface ServletInitializer {
-    TByteObjectMap<MethodState>[] initialize(Class<?> router);
+    TByteObjectMap<MethodState> initialize(Class<?> router);
 }
