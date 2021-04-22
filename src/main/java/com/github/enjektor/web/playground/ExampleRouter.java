@@ -16,8 +16,8 @@ public class ExampleRouter {
     private StringRandomizer stringRandomizer;
 
     @Get
-    public String execute() {
-        return stringRandomizer.randomize();
+    public String health() {
+        return "OK";
     }
 
     @Get("/end")
@@ -25,11 +25,15 @@ public class ExampleRouter {
         return "end " + stringRandomizer.randomize();
     }
 
-    @Post("/body/{bodies}/another/{boi}")
-    public Human getBody(@Body Human human,
-                         @Param String bodies) {
+    @Post("/body")
+    public Human getBody(@Body Human human) {
         human.setName("estimated");
         return human;
     }
 
+    @Get("/b/{bodies}/another/{boi}")
+    public void params(@Param String bodies,
+                         @Param("boi") String boiParam) {
+        int x = 10;
+    }
 }

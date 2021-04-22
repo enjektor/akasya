@@ -4,7 +4,6 @@ import com.github.enjektor.web.annotations.Param;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.lang.reflect.Parameter;
-import java.util.Optional;
 
 public class ParamAnnotationParameterInvocationHandler implements ParameterInvocationHandler {
 
@@ -12,13 +11,16 @@ public class ParamAnnotationParameterInvocationHandler implements ParameterInvoc
     public Object handle(final HttpServletRequest httpServletRequest,
                          final Parameter parameter,
                          final String path) {
+        final Param annotation = parameter.getAnnotation(Param.class);
 
         final String requestURI = httpServletRequest.getRequestURI();
-        final Param annotation = parameter.getAnnotation(Param.class);
-        final String pathParamName = !annotation.value().isEmpty() ? annotation.value() : parameter.getName();
+        final String parameterName = !annotation.value().isEmpty() ? template(annotation.value()) : template(parameter.getName());
+        final int startIndex = path.indexOf(parameterName);
 
+        return requestURI.substring(startIndex).split("/")[0];
+    }
 
-
-        return null;
+    private String template(String any) {
+        return "{" + any + "}";
     }
 }

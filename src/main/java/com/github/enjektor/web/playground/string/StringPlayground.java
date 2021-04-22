@@ -1,5 +1,7 @@
 package com.github.enjektor.web.playground.string;
 
+import java.util.Arrays;
+
 public class StringPlayground {
     public static void main(String[] args) {
 
@@ -11,21 +13,39 @@ public class StringPlayground {
         System.out.println(substring);
 
 
-        String pathInMethodTwo = "/human/cat/{robot}";
-        String pathTwo = "/human/cat/ellipse";
+        final String calculate = calculate(pathInMethod);
+        System.out.println("calculate = " + calculate);
 
-        final int anotherStartIndex = pathInMethodTwo.indexOf("{robot}");
-        final String aSub = pathTwo.substring(anotherStartIndex).split("/")[0];
-        System.out.println(aSub);
-
+        final String calculate1 = calculate(path);
     }
 
-    private static int howSlashContains(String x) {
-        int count = 0;
-        final char[] chars = x.toCharArray();
-        for (char y : chars) {
-            if (y == '/') count++;
+    private static String calculate(String p) {
+        final String[] split = p.substring(1).split("/");
+        byte[] index = new byte[split.length];
+
+        byte count = (byte) 0;
+
+        for (String s : split) {
+            if (s.contains("{")) {
+                index[count] = (byte) 0;
+                count++;
+                continue;
+            }
+            index[count] = (byte) 1;
+            count++;
         }
-        return count;
+
+        System.out.println(Arrays.toString(split));
+        System.out.println(Arrays.toString(index));
+
+        count = (byte) 0;
+        StringBuilder stringBuilder = new StringBuilder();
+        for (byte b : index)
+            if (b == 1) stringBuilder.append(split[count++]);
+            else count++;
+
+        return stringBuilder.toString();
     }
+
+
 }
