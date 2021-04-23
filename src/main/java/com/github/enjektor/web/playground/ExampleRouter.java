@@ -32,8 +32,15 @@ public class ExampleRouter {
     }
 
     @Get("/b/{bodies}/another/{boi}")
-    public void params(@Param("bodies") String bodies,
-                       @Param("boi") String boiParam) {
+    public int params(@Param("bodies") String bodies,
+                      @Param("boi") String boiParam) {
         int x = 10;
+        return x;
+    }
+
+    @Get("/{param}")
+    public void param(@Param("param") String param) {
+
+        int y = 10;
     }
 }

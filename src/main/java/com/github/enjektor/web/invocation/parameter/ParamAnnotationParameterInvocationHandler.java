@@ -7,7 +7,6 @@ import java.lang.reflect.Parameter;
 
 public class ParamAnnotationParameterInvocationHandler implements ParameterInvocationHandler {
 
-
     @Override
     public Object handle(final HttpServletRequest httpServletRequest,
                          final Parameter parameter,
