@@ -7,17 +7,18 @@ import java.lang.reflect.Parameter;
 
 public class ParamAnnotationParameterInvocationHandler implements ParameterInvocationHandler {
 
+
     @Override
     public Object handle(final HttpServletRequest httpServletRequest,
                          final Parameter parameter,
-                         final String path) {
+                         final String pathInMethod) {
         final Param annotation = parameter.getAnnotation(Param.class);
 
-        final String requestURI = httpServletRequest.getRequestURI();
-        final String parameterName = !annotation.value().isEmpty() ? template(annotation.value()) : template(parameter.getName());
-        final int startIndex = path.indexOf(parameterName);
+        final String pathInServlet = httpServletRequest.getRequestURI();
+        final String parameterName = template(annotation.value());
+        final int startIndex = pathInMethod.indexOf(parameterName);
 
-        return requestURI.substring(startIndex).split("/")[0];
+        return pathInServlet.substring(startIndex).split("/")[0];
     }
 
     private String template(String any) {

@@ -7,6 +7,7 @@ import com.github.enjektor.web.servlet.endpoint.hash.ByteHashProvider;
 import com.github.enjektor.web.servlet.endpoint.hash.HashProvider;
 import com.github.enjektor.web.servlet.endpoint.information.DefaultEndpointInformation;
 import com.github.enjektor.web.servlet.endpoint.information.EndpointInformation;
+import com.github.enjektor.web.state.EndpointState;
 import com.github.enjektor.web.state.MethodState;
 import gnu.trove.map.TByteObjectMap;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,19 +15,17 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.regex.Matcher;
 
 import static com.github.enjektor.web.WebConstants.HTTP_METHOD_GET;
-import static com.github.enjektor.web.WebConstants.HTTP_METHOD_POST;
 
 public class DefaultEndpointManager implements EndpointManager {
 
     private final EndpointInformation<String> endpointInformation;
     private final HashProvider hashProvider;
     private final InvocationHandler invocationHandler;
-    private final TByteObjectMap<MethodState> methods;
     private final MethodState GET_STATE;
     private final Object routerObject;
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public DefaultEndpointManager(final Object routerObject,
                                   final TByteObjectMap<MethodState> methods) {
@@ -34,44 +33,33 @@ public class DefaultEndpointManager implements EndpointManager {
         this.invocationHandler = InvocationHandlerImpl.getInstance();
         this.endpointInformation = DefaultEndpointInformation.getInstance();
         this.hashProvider = ByteHashProvider.getInstance();
-        this.methods = methods;
         this.GET_STATE = methods.get(HTTP_METHOD_GET);
     }
 
-    private short weight(String endpoint) {
-        short count = (short) 0;
-        for (char c : endpoint.toCharArray()) {
-        }
-        return 0;
-    }
 
+    /**
+     * \/v1\/b\/(\w+)\/another\/(\w+)
+     * /v1/b/enes/another/feyza
+     * /v1/b/{body}/another/{boi}
+     */
     @Override
     public void manageGet(HttpServletRequest req, HttpServletResponse res) {
         final String endpoint = endpointInformation.collectInformation(req);
-
-        /**
-         * \/v1\/b\/(\w+)\/another\/(\w+)
-         * /v1/b/enes/another/feyza
-         * /v1/b/{body}/another/{boi}
-         */
-
         final byte unsignedHashValue = hashProvider.provide(endpoint);
-
         final Method methodThatWillExecute = GET_STATE.getMethods().get(unsignedHashValue);
 
-        if (methodThatWillExecute == null) {
-            List<String> patterns = GET_STATE.getPatterns();
-            for (String pattern : patterns) {
-                if (endpoint.matches(pattern)) {
-                    byte hashRegex = hashProvider.provide(pattern);
+        if (methodThatWillExecute != null) {
+            invocationHandler.invoke(routerObject, methodThatWillExecute, req, res);
+        } else {
+            for (EndpointState state : GET_STATE.getStates()) {
+                final Matcher matcher = state.getPattern().matcher(endpoint);
+                if (matcher.find()) {
+                    byte hashRegex = hashProvider.provide(state.getEndpoint());
                     final Method method = GET_STATE.getMethods().get(hashRegex);
-                    invocationHandler.invoke(routerObject, method, res);
+                    invocationHandler.invoke(routerObject, method, req, res);
                 }
             }
-        } else {
-            invocationHandler.invoke(routerObject, methodThatWillExecute, res);
         }
-
     }
 
     @Override

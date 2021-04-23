@@ -6,17 +6,16 @@ public class StringPlayground {
     public static void main(String[] args) {
 
         String pathInMethod = "/deploy-folder/{mapping}/request-path";
-        String path = "/deploy-folder/servlet-mapping/request-path";
+        String pathInServlet = "/deploy-folder/servlet-mapping/request-path";
 
         final int startIndex = pathInMethod.indexOf("{mapping}");
-        final String substring = path.substring(startIndex).split("/")[0];
+        final String substring = pathInServlet.substring(startIndex).split("/")[0];
         System.out.println(substring);
 
 
         final String calculate = calculate(pathInMethod);
         System.out.println("calculate = " + calculate);
 
-        final String calculate1 = calculate(path);
     }
 
     private static String calculate(String p) {
@@ -34,9 +33,6 @@ public class StringPlayground {
             index[count] = (byte) 1;
             count++;
         }
-
-        System.out.println(Arrays.toString(split));
-        System.out.println(Arrays.toString(index));
 
         count = (byte) 0;
         StringBuilder stringBuilder = new StringBuilder();

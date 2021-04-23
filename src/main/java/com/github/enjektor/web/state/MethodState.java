@@ -7,19 +7,19 @@ import java.util.List;
 
 public class MethodState {
     private final TByteObjectMap<Method> methods;
-    private final List<String> patterns;
+    private final List<EndpointState> states;
 
     public static class Builder {
         private TByteObjectMap<Method> methods;
-        private List<String> patterns;
+        private List<EndpointState> states;
 
         public Builder methods(TByteObjectMap<Method> methods) {
             this.methods = methods;
             return this;
         }
 
-        public Builder patterns(List<String> patterns) {
-            this.patterns = patterns;
+        public Builder states(List<EndpointState> states) {
+            this.states = states;
             return this;
         }
 
@@ -30,14 +30,14 @@ public class MethodState {
 
     private MethodState(Builder builder) {
         this.methods = builder.methods;
-        this.patterns = builder.patterns;
+        this.states = builder.states;
     }
 
     public TByteObjectMap<Method> getMethods() {
         return methods;
     }
 
-    public List<String> getPatterns() {
-        return patterns;
+    public List<EndpointState> getStates() {
+        return states;
     }
 }

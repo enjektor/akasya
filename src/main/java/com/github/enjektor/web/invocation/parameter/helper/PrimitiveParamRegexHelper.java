@@ -12,8 +12,8 @@ public class PrimitiveParamRegexHelper implements ParamRegexHelper {
 
     @Override
     public String regex(String endpoint) {
-        final String[] split = endpoint.substring(1).split("/");
         final StringBuilder stringBuilder = new StringBuilder();
+        final String[] split = endpoint.substring(1).split("/");
 
         for (String each : split) {
             if (each.contains("{")) stringBuilder.append("\\/(\\w+)");

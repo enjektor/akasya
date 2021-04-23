@@ -5,17 +5,20 @@ import com.github.enjektor.web.invocation.parameter.helper.ParamRegexHelper;
 import com.github.enjektor.web.invocation.parameter.helper.PrimitiveParamRegexHelper;
 import com.github.enjektor.web.servlet.endpoint.hash.ByteHashProvider;
 import com.github.enjektor.web.servlet.endpoint.hash.HashProvider;
+import com.github.enjektor.web.state.EndpointState;
 import com.github.enjektor.web.state.MethodState;
 import gnu.trove.map.TByteObjectMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.regex.Pattern;
 
 public class DefaultServletMethodInitializer implements ServletMethodInitializer {
 
+    private static final ParamRegexHelper paramRegexHelper = new PrimitiveParamRegexHelper();
     private final HashProvider hashProvider;
 
     public DefaultServletMethodInitializer() {
@@ -25,7 +28,7 @@ public class DefaultServletMethodInitializer implements ServletMethodInitializer
     @Override
     public MethodState initializeGet(Class<?> routerClass) {
         final TByteObjectMap<Method> map = new TByteObjectHashMap<>();
-        final List<String> patterns = new ArrayList<>();
+        final List<EndpointState> patterns = new ArrayList<>();
         final Method[] declaredMethods = routerClass.getDeclaredMethods();
         final String routerEndpoint = routerEndpoint(routerClass);
 
@@ -33,18 +36,29 @@ public class DefaultServletMethodInitializer implements ServletMethodInitializer
             if (method.isAnnotationPresent(Get.class)) {
                 final Get getAnnotation = method.getAnnotation(Get.class);
                 final String endpointValue = routerEndpoint + getAnnotation.value();
-                ParamRegexHelper paramRegexHelper = new PrimitiveParamRegexHelper();
-                final String regex = paramRegexHelper.regex(endpointValue);
-                patterns.add(regex);
 
-                final byte hashValue = hashProvider.provide(regex);
+                final String s = Optional
+                        .of(endpointValue)
+                        .filter(val -> val.contains("{"))
+                        .map(val -> {
+                            final String regex = paramRegexHelper.regex(endpointValue);
+                            final EndpointState endpointState = new EndpointState.Builder()
+                                    .endpoint(regex)
+                                    .pattern(Pattern.compile(regex))
+                                    .build();
+
+                            patterns.add(endpointState);
+                            return regex;
+                        }).orElse(endpointValue);
+
+                final byte hashValue = hashProvider.provide(s);
                 map.put(hashValue, method);
             }
         }
 
         return new MethodState.Builder()
                 .methods(map)
-                .patterns(patterns)
+                .states(patterns)
                 .build();
     }
 
