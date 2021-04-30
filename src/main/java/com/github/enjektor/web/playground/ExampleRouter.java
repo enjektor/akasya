@@ -1,11 +1,7 @@
 package com.github.enjektor.web.playground;
 
 import com.github.enjektor.core.annotations.Inject;
-import com.github.enjektor.web.annotations.Body;
-import com.github.enjektor.web.annotations.Get;
-import com.github.enjektor.web.annotations.Param;
-import com.github.enjektor.web.annotations.Post;
-import com.github.enjektor.web.annotations.Router;
+import com.github.enjektor.web.annotations.*;
 import com.github.enjektor.web.playground.domain.Human;
 import com.github.enjektor.web.playground.injectable.StringRandomizer;
 
@@ -38,9 +34,11 @@ public class ExampleRouter {
         return x;
     }
 
-    @Get("/{param}")
-    public void param(@Param("param") String param) {
-
+    @Get("/api/employees/{id}/{name}")
+    public void springExample(@Param("id") String id,
+                              @Param("name") String name,
+                              @Query("sort") String sort,
+                              @Query("page") String page) {
         int y = 10;
     }
 }
