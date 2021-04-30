@@ -2,33 +2,35 @@ package com.github.enjektor.web.invocation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.enjektor.web.annotations.Body;
-import com.github.enjektor.web.playground.domain.Human;
+import com.github.enjektor.web.annotations.Delete;
+import com.github.enjektor.web.annotations.Get;
+import com.github.enjektor.web.annotations.Param;
+import com.github.enjektor.web.annotations.Post;
+import com.github.enjektor.web.annotations.Put;
+import com.github.enjektor.web.invocation.parameter.BodyAnnotationParameterInvocationHandler;
+import com.github.enjektor.web.invocation.parameter.ParamAnnotationParameterInvocationHandler;
+import com.github.enjektor.web.invocation.parameter.ParameterInvocationHandler;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.io.BufferedReader;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.HashMap;
+import java.util.Map;
 
 public class InvocationHandlerImpl implements InvocationHandler {
 
+    private static final byte INITIAL_CAPACITY = (byte) 2;
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private final Map<Class<? extends Annotation>, ParameterInvocationHandler> parameterInvocationHandlerMap = new HashMap<>(INITIAL_CAPACITY);
     private static InvocationHandler instance;
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private InvocationHandlerImpl() {
-
-    }
-
-    @Override
-    public void invoke(Object routerObject, Method method, HttpServletResponse response) {
-        try {
-            final String result = method.invoke(routerObject).toString();
-            response.getOutputStream().write(result.getBytes());
-        } catch (IllegalAccessException | InvocationTargetException | IOException e) {
-            e.printStackTrace();
-        }
+        parameterInvocationHandlerMap.put(Body.class, new BodyAnnotationParameterInvocationHandler());
+        parameterInvocationHandlerMap.put(Param.class, new ParamAnnotationParameterInvocationHandler());
     }
 
     @Override
@@ -36,22 +38,23 @@ public class InvocationHandlerImpl implements InvocationHandler {
                        Method method,
                        HttpServletRequest request,
                        HttpServletResponse response) {
+        response.setHeader("Content-Type", "application/json");
+        Parameter[] parameters = method.getParameters();
+        String info = request.getServletPath() + getInfo(method);
+        Object[] params = new Object[parameters.length];
+
+        byte count = (byte) 0;
+        for (Parameter parameter : parameters) {
+            final Class<? extends Annotation> annotationType = parameter.getAnnotations()[0].annotationType();
+            final Object handle = parameterInvocationHandlerMap.get(annotationType).handle(request, parameter, info);
+            params[count++] = handle;
+        }
+
         try {
-            final Parameter[] parameters = method.getParameters();
-            final Parameter firstParameter = parameters[0];
-            if (firstParameter.isAnnotationPresent(Body.class)) {
-                try {
-                    response.setHeader("Content-Type", "application/json");
-                    final Class<?> type = firstParameter.getType();
-                    final Object o = objectMapper.readValue(getBody(request), type);
-                    final Object result = method.invoke(routerObject, o);
-                    final String s = objectMapper.writeValueAsString(result);
-                    response.getOutputStream().write(s.getBytes());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        } catch (IllegalAccessException | InvocationTargetException e) {
+            final Object invoke = method.invoke(routerObject, params);
+            final String s = objectMapper.writeValueAsString(invoke);
+            response.getOutputStream().write(s.getBytes());
+        } catch (IllegalAccessException | InvocationTargetException | IOException e) {
             e.printStackTrace();
         }
     }
@@ -61,13 +64,17 @@ public class InvocationHandlerImpl implements InvocationHandler {
         return instance;
     }
 
-    public String getBody(HttpServletRequest request) throws IOException {
-        StringBuilder buffer = new StringBuilder();
-        BufferedReader reader = request.getReader();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            buffer.append(line);
+    private String getInfo(Method method) {
+        if (method.isAnnotationPresent(Get.class)) {
+            return method.getAnnotation(Get.class).value();
+        } else if (method.isAnnotationPresent(Post.class)) {
+            return method.getAnnotation(Post.class).value();
+        } else if (method.isAnnotationPresent(Put.class)) {
+            return method.getAnnotation(Put.class).value();
+        } else if (method.isAnnotationPresent(Delete.class)) {
+            return method.getAnnotation(Delete.class).value();
         }
-        return buffer.toString();
+        return "";
     }
+
 }

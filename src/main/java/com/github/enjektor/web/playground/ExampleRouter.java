@@ -3,6 +3,7 @@ package com.github.enjektor.web.playground;
 import com.github.enjektor.core.annotations.Inject;
 import com.github.enjektor.web.annotations.Body;
 import com.github.enjektor.web.annotations.Get;
+import com.github.enjektor.web.annotations.Param;
 import com.github.enjektor.web.annotations.Post;
 import com.github.enjektor.web.annotations.Router;
 import com.github.enjektor.web.playground.domain.Human;
@@ -15,8 +16,8 @@ public class ExampleRouter {
     private StringRandomizer stringRandomizer;
 
     @Get
-    public String execute() {
-        return stringRandomizer.randomize();
+    public String health() {
+        return "OK";
     }
 
     @Get("/end")
@@ -30,4 +31,16 @@ public class ExampleRouter {
         return human;
     }
 
+    @Get("/b/{bodies}/another/{boi}")
+    public int params(@Param("bodies") String bodies,
+                      @Param("boi") String boiParam) {
+        int x = 10;
+        return x;
+    }
+
+    @Get("/{param}")
+    public void param(@Param("param") String param) {
+
+        int y = 10;
+    }
 }

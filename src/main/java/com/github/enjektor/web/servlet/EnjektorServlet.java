@@ -12,14 +12,10 @@ import java.io.IOException;
 public class EnjektorServlet extends HttpServlet {
 
     private static final ServletInitializer servletInitializer = new DefaultServletInitializer();
-    private final Object routerObject;
-    private final Class<?> routerClass;
     private final EndpointManager endpointManager;
 
     public EnjektorServlet(final Object routerObject,
                            final Class<?> routerClass) {
-        this.routerObject = routerObject;
-        this.routerClass = routerClass;
         this.endpointManager = new DefaultEndpointManager(routerObject, servletInitializer.initialize(routerClass));
     }
 
