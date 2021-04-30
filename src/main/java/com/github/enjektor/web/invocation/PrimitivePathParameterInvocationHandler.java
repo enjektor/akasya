@@ -8,14 +8,19 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class PrimitivePathParameterInvocationHandler implements PathParameterInvocationHandler {
 
+    private static final byte INITIAL_CAPACITY = (byte) 3;
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static PathParameterInvocationHandler instance;
 
@@ -33,23 +38,32 @@ public class PrimitivePathParameterInvocationHandler implements PathParameterInv
 
         response.setHeader("Content-Type", "application/json");
         Parameter[] parameters = method.getParameters();
+        List<String> queries = new ArrayList<>(INITIAL_CAPACITY);
 
-        boolean hasAllParam = false;
+        byte pathParamCounter = (byte) 0;
         for (Parameter parameter : parameters) {
-            if (parameter.isAnnotationPresent(Param.class)) hasAllParam = true;
-            else hasAllParam = false;
+            if (parameter.isAnnotationPresent(Param.class)) {
+                pathParamCounter++;
+            } else if (parameter.isAnnotationPresent(Query.class)) {
+                final Query annotation = parameter.getAnnotation(Query.class);
+                queries.add(annotation.value());
+            }
         }
 
-        final int length = parameters.length;
         Object[] params = new Object[parameters.length];
 
-        if (hasAllParam) {
-            final Matcher matcher = pattern.matcher(requestURI);
+        final Matcher matcher = pattern.matcher(requestURI);
 
-            if (matcher.find())
-                for (int i = 1; i < length + 1; i++) params[i - 1] = matcher.group(i);
-
+        byte counter = (byte) 0;
+        if (matcher.find()) {
+            for (int i = 1; i < pathParamCounter + 1; i++) {
+                params[i - 1] = matcher.group(i);
+                counter++;
+            }
         }
+
+        byte requestQueryCounter = counter;
+        for (String query : queries) params[requestQueryCounter++] = request.getParameter(query);
 
         try {
             final Object invoke = method.invoke(router, params);
