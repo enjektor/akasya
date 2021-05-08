@@ -5,7 +5,9 @@ import com.github.enjektor.context.PrimitiveApplicationContext;
 import com.github.enjektor.context.dependency.DefaultDependencyInitializer;
 import com.github.enjektor.context.dependency.DependencyInitializer;
 import com.github.enjektor.web.WebDependencyInitializer;
+import com.github.enjektor.web.servlet.DefaultServletInitializer;
 import com.github.enjektor.web.servlet.EnjektorServlet;
+import com.github.enjektor.web.servlet.ServletInitializer;
 import com.google.common.collect.ImmutableList;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
@@ -24,7 +26,9 @@ public class Main {
         final ApplicationContext applicationContext = new PrimitiveApplicationContext(Main.class, dependencyInitializers);
         final ExampleRouter bean = applicationContext.getBean(ExampleRouter.class);
 
-        EnjektorServlet defaultEnjektorServlet = new EnjektorServlet(bean, ExampleRouter.class);
+        final ServletInitializer servletInitializer = new DefaultServletInitializer();
+
+        EnjektorServlet defaultEnjektorServlet = new EnjektorServlet(bean, ExampleRouter.class, servletInitializer);
 
         Server server = new Server();
         ServerConnector connector = new ServerConnector(server);

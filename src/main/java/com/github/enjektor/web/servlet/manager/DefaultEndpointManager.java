@@ -1,24 +1,22 @@
-package com.github.enjektor.web.servlet.endpoint;
+package com.github.enjektor.web.servlet.manager;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.enjektor.web.invocation.InvocationHandler;
 import com.github.enjektor.web.invocation.InvocationHandlerImpl;
 import com.github.enjektor.web.invocation.PathParameterInvocationHandler;
 import com.github.enjektor.web.invocation.PrimitivePathParameterInvocationHandler;
-import com.github.enjektor.web.servlet.endpoint.hash.ByteHashProvider;
-import com.github.enjektor.web.servlet.endpoint.hash.HashProvider;
+import com.github.enjektor.web.utils.hash.ByteHashProvider;
+import com.github.enjektor.web.utils.hash.HashProvider;
 import com.github.enjektor.web.servlet.endpoint.information.DefaultEndpointInformation;
 import com.github.enjektor.web.servlet.endpoint.information.EndpointInformation;
 import com.github.enjektor.web.state.EndpointState;
 import com.github.enjektor.web.state.MethodState;
-import com.github.enjektor.web.state.PathParamState;
+import com.github.enjektor.web.state.ParameterState;
 import com.github.enjektor.web.state.RequestState;
 import gnu.trove.map.TByteObjectMap;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -65,10 +63,9 @@ public class DefaultEndpointManager implements EndpointManager {
                     byte hashRegex = hashProvider.provide(state.getEndpoint());
                     final Method method = GET_STATE.getMethods().get(hashRegex);
 
-                    PathParamState pathParamState = new PathParamState.Builder()
+                    ParameterState pathParamState = new ParameterState.Builder()
                             .method(method)
                             .pattern(pattern)
-                            .router(routerObject)
                             .build();
 
                     RequestState requestState = new RequestState.Builder()

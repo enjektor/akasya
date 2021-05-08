@@ -1,4 +1,4 @@
-package com.github.enjektor.web.servlet.endpoint.hash;
+package com.github.enjektor.web.utils.hash;
 
 import static com.github.enjektor.web.WebConstants.HASH_KEY;
 import static com.github.enjektor.web.WebConstants.MASKING_VALUE;
