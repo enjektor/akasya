@@ -1,4 +1,4 @@
-package com.github.enjektor.web.servlet.endpoint.hash;
+package com.github.enjektor.web.utils.hash;
 
 public interface HashProvider {
     byte provide(String endpoint);

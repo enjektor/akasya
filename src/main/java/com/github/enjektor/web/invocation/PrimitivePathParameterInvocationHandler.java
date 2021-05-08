@@ -2,19 +2,17 @@ package com.github.enjektor.web.invocation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.enjektor.web.annotations.*;
-import com.github.enjektor.web.state.PathParamState;
+import com.github.enjektor.web.state.ParameterState;
 import com.github.enjektor.web.state.RequestState;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,7 +23,7 @@ public class PrimitivePathParameterInvocationHandler implements PathParameterInv
     private static PathParameterInvocationHandler instance;
 
     @Override
-    public void invoke(PathParamState pathParamState,
+    public void invoke(ParameterState pathParamState,
                        RequestState requestState) {
         final Method method = pathParamState.getMethod();
         final Pattern pattern = pathParamState.getPattern();
