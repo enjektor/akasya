@@ -5,7 +5,7 @@ import com.github.enjektor.web.invocation.parameter.helper.ParamRegexHelper;
 import com.github.enjektor.web.invocation.parameter.helper.PrimitiveParamRegexHelper;
 import com.github.enjektor.web.utils.hash.ByteHashProvider;
 import com.github.enjektor.web.utils.hash.HashProvider;
-import com.github.enjektor.web.state.EndpointState;
+import com.github.enjektor.web.state.PathParameterState;
 import com.github.enjektor.web.state.MethodState;
 import gnu.trove.map.TByteObjectMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
@@ -28,7 +28,7 @@ public class DefaultServletMethodInitializer implements ServletMethodInitializer
     @Override
     public MethodState initializeGet(Class<?> routerClass) {
         final TByteObjectMap<Method> map = new TByteObjectHashMap<>();
-        final List<EndpointState> patterns = new ArrayList<>();
+        final List<PathParameterState> states = new ArrayList<>();
         final Method[] declaredMethods = routerClass.getDeclaredMethods();
         final String routerEndpoint = routerEndpoint(routerClass);
 
@@ -42,12 +42,12 @@ public class DefaultServletMethodInitializer implements ServletMethodInitializer
                         .filter(val -> val.contains("{"))
                         .map(val -> {
                             final String regex = paramRegexHelper.regex(endpointValue);
-                            final EndpointState endpointState = new EndpointState.Builder()
+                            final PathParameterState endpointState = new PathParameterState.Builder()
                                     .endpoint(regex)
                                     .pattern(Pattern.compile(regex))
                                     .build();
 
-                            patterns.add(endpointState);
+                            states.add(endpointState);
                             return regex;
                         }).orElse(endpointValue);
 
@@ -58,7 +58,7 @@ public class DefaultServletMethodInitializer implements ServletMethodInitializer
 
         return new MethodState.Builder()
                 .methods(map)
-                .states(patterns)
+                .states(states)
                 .build();
     }
 

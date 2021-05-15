@@ -1,35 +1,47 @@
 package com.github.enjektor.web.servlet;
 
 import com.github.enjektor.web.enums.HttpMethod;
+import com.github.enjektor.web.invocation.*;
 import com.github.enjektor.web.servlet.manager.DefaultEndpointManager;
 import com.github.enjektor.web.servlet.manager.EndpointManager;
+import com.github.enjektor.web.servlet.manager.PrimitiveEndpointManager;
 import com.github.enjektor.web.state.HttpState;
 import com.github.enjektor.web.state.MethodState;
+import com.github.enjektor.web.state.EndpointState;
 import com.github.enjektor.web.state.RequestState;
 import gnu.trove.map.TByteObjectMap;
+import gnu.trove.map.hash.TByteObjectHashMap;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiConsumer;
+import java.lang.reflect.Method;
 
 public class EnjektorServlet extends HttpServlet {
 
-    private final Map<HttpMethod, BiConsumer<Object, HttpState>> actionMap = new HashMap<>(2);
     private final EndpointManager endpointManager;
     private final TByteObjectMap<MethodState> stateMap;
     private final Object routerObject;
+    private final InvocationHandler invocationHandler;
+    private final PathParameterInvocationHandler pathParameterInvocationHandler;
+    private final TByteObjectMap<InvokeCommand> invokeMap = new TByteObjectHashMap<>(2);
 
     public EnjektorServlet(final Object routerObject,
                            final Class<?> routerClass,
                            final ServletInitializer servletInitializer) {
         this.routerObject = routerObject;
-        this.endpointManager = new DefaultEndpointManager(routerObject, servletInitializer.initialize(routerClass));
+        this.endpointManager = new PrimitiveEndpointManager();
         this.stateMap = servletInitializer.initialize(routerClass);
+        this.invocationHandler = InvocationHandlerImpl.getInstance();
+        this.pathParameterInvocationHandler = new PrimitivePathParameterInvocationHandler();
+    }
+
+    @Override
+    public void init() throws ServletException {
+        invokeMap.put((byte) 0, new DefaultInvokeCommand());
+        invokeMap.put((byte) 1, new PathInvokeCommand());
     }
 
     @Override
@@ -45,7 +57,12 @@ public class EnjektorServlet extends HttpServlet {
                 .build();
 
         final HttpState httpState = endpointManager.process(requestState, HttpMethod.GET);
-        actionMap.get(HttpMethod.GET).accept(routerObject, httpState);
+        final EndpointState endpointState = httpState.getEndpointState();
+        endpointState.setRouterObject(routerObject);
+
+        // TODO: implement command pattern for method invocation
+        final byte stateType = endpointState.stateType();
+        invokeMap.get(stateType).execute(endpointState, requestState);
     }
 
     @Override

@@ -1,7 +1,8 @@
 package com.github.enjektor.web.invocation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.enjektor.web.annotations.*;
+import com.github.enjektor.web.annotations.Param;
+import com.github.enjektor.web.annotations.Query;
 import com.github.enjektor.web.state.EndpointState;
 import com.github.enjektor.web.state.RequestState;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,15 +17,13 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class PrimitivePathParameterInvocationHandler implements PathParameterInvocationHandler {
+public class PathInvokeCommand implements InvokeCommand {
 
     private static final byte INITIAL_CAPACITY = (byte) 3;
     private static final ObjectMapper objectMapper = new ObjectMapper();
-    private static PathParameterInvocationHandler instance;
 
     @Override
-    public void invoke(EndpointState endpointState,
-                       RequestState requestState) {
+    public void execute(EndpointState endpointState, RequestState requestState) {
         final Method method = endpointState.getMethod();
         final Pattern pattern = endpointState.getPattern();
         final Object router = endpointState.getRouterObject();
@@ -71,10 +70,4 @@ public class PrimitivePathParameterInvocationHandler implements PathParameterInv
             e.printStackTrace();
         }
     }
-
-    public static PathParameterInvocationHandler getInstance() {
-        if (instance == null) instance = new PrimitivePathParameterInvocationHandler();
-        return instance;
-    }
-
 }
