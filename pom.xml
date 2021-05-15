@@ -10,10 +10,10 @@
     <version>0.0.6.RELEASE</version>
   </parent>
 
-  <artifactId>enjektor-web</artifactId>
+  <artifactId>akasya</artifactId>
   <version>0.0.1</version>
 
-  <name>enjektor-web</name>
+  <name>akasya</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
