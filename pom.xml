@@ -7,13 +7,13 @@
   <parent>
     <groupId>com.github.enjektor</groupId>
     <artifactId>enjektor</artifactId>
-    <version>0.0.5</version>
+    <version>0.0.6.RELEASE</version>
   </parent>
 
-  <artifactId>enjektor-web</artifactId>
+  <artifactId>akasya</artifactId>
   <version>0.0.1</version>
 
-  <name>enjektor-web</name>
+  <name>akasya</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -21,6 +21,12 @@
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.12.2</version>
+    </dependency>
+
     <dependency>
       <groupId>net.sf.trove4j</groupId>
       <artifactId>trove4j</artifactId>
@@ -30,13 +36,7 @@
     <dependency>
       <groupId>com.github.enjektor</groupId>
       <artifactId>enjektor-context</artifactId>
-      <version>0.0.5.2</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.github.enjektor</groupId>
-      <artifactId>enjektor-core</artifactId>
-      <version>0.0.3.2</version>
+      <version>0.0.6.1</version>
     </dependency>
 
     <dependency>
