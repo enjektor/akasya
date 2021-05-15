@@ -8,13 +8,17 @@ import com.github.enjektor.web.WebDependencyInitializer;
 import com.github.enjektor.web.servlet.DefaultServletInitializer;
 import com.github.enjektor.web.servlet.EnjektorServlet;
 import com.github.enjektor.web.servlet.ServletInitializer;
+import com.github.enjektor.web.servlet.filter.SimpleServletFilter;
 import com.google.common.collect.ImmutableList;
+import jakarta.servlet.DispatcherType;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
+import java.util.EnumSet;
 import java.util.List;
 
 public class Main {
@@ -36,15 +40,14 @@ public class Main {
 
         server.setConnectors(new Connector[] {connector});
 
-        ServletHolder holderOne = new ServletHolder();
-        holderOne.setServlet(defaultEnjektorServlet);
-
+        ServletHolder holder = new ServletHolder();
+        holder.setServlet(defaultEnjektorServlet);
 
         ServletHandler servletHandler = new ServletHandler();
+        servletHandler.addServletWithMapping(holder, "/v1/*");
+        servletHandler.addFilterWithMapping(SimpleServletFilter.class, "/v1/*", EnumSet.of(DispatcherType.REQUEST));
+
         server.setHandler(servletHandler);
-
-        servletHandler.addServletWithMapping(holderOne, "/v1/*");
-
         server.start();
         System.gc();
     }

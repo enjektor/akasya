@@ -7,18 +7,18 @@ import java.util.List;
 
 public class MethodState {
     private final TByteObjectMap<Method> methods;
-    private final List<EndpointState> states;
+    private final List<PathParameterState> states;
 
     public static class Builder {
         private TByteObjectMap<Method> methods;
-        private List<EndpointState> states;
+        private List<PathParameterState> states;
 
         public Builder methods(TByteObjectMap<Method> methods) {
             this.methods = methods;
             return this;
         }
 
-        public Builder states(List<EndpointState> states) {
+        public Builder states(List<PathParameterState> states) {
             this.states = states;
             return this;
         }
@@ -37,7 +37,7 @@ public class MethodState {
         return methods;
     }
 
-    public List<EndpointState> getStates() {
+    public List<PathParameterState> getStates() {
         return states;
     }
 }

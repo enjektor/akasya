@@ -30,16 +30,15 @@ public class PrimitiveEndpointManager implements EndpointManager {
         final Method methodThatWillInvoke = methods.get(unsignedHashValue);
 
         if (methodThatWillInvoke != null) {
-            ParameterState parameterState = new ParameterState.Builder()
+            EndpointState parameterState = new EndpointState.Builder()
                     .method(methodThatWillInvoke)
                     .build();
 
             return new HttpState.Builder()
                     .parameterState(parameterState)
-                    .requestState(requestState)
                     .build();
         } else {
-            for (EndpointState state : states.getStates()) {
+            for (PathParameterState state : states.getStates()) {
                 final Pattern pattern = state.getPattern();
                 final Matcher matcher = pattern.matcher(endpoint);
 
@@ -47,14 +46,13 @@ public class PrimitiveEndpointManager implements EndpointManager {
                     final byte hashRegex = hashProvider.provide(state.getEndpoint());
                     final Method method = methods.get(hashRegex);
 
-                    final ParameterState parameterState = new ParameterState.Builder()
+                    final EndpointState parameterState = new EndpointState.Builder()
                             .method(method)
                             .pattern(pattern)
                             .build();
 
                     return new HttpState.Builder()
                             .parameterState(parameterState)
-                            .requestState(requestState)
                             .build();
                 }
             }
