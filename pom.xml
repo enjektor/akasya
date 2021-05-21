@@ -36,7 +36,7 @@
     <dependency>
       <groupId>com.github.enjektor</groupId>
       <artifactId>enjektor-context</artifactId>
-      <version>0.0.6.1</version>
+      <version>0.0.6.5</version>
     </dependency>
 
     <dependency>
