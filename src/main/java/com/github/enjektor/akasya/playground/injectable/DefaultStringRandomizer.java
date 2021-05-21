@@ -1,0 +1,19 @@
+package com.github.enjektor.akasya.playground.injectable;
+
+import com.github.enjektor.core.annotations.Dependency;
+
+import java.util.concurrent.ThreadLocalRandom;
+
+@Dependency
+public class DefaultStringRandomizer implements StringRandomizer {
+    @Override
+    public String randomize() {
+        char[] arr = new char[5];
+
+        for (int i = 0; i < 5; i++) {
+            int randomNum = ThreadLocalRandom.current().nextInt(65, 90);
+            arr[i] = (char) randomNum;
+        }
+        return String.valueOf(arr);
+    }
+}

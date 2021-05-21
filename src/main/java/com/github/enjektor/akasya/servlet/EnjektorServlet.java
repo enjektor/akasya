@@ -22,8 +22,6 @@ public class EnjektorServlet extends HttpServlet {
     private final EndpointManager endpointManager;
     private final TByteObjectMap<MethodState> stateMap;
     private final Object routerObject;
-    private final InvocationHandler invocationHandler;
-    private final PathParameterInvocationHandler pathParameterInvocationHandler;
     private final TByteObjectMap<InvokeCommand> invokeMap = new TByteObjectHashMap<>(2);
 
     public EnjektorServlet(final Object routerObject,
@@ -32,8 +30,6 @@ public class EnjektorServlet extends HttpServlet {
         this.routerObject = routerObject;
         this.endpointManager = new PrimitiveEndpointManager();
         this.stateMap = servletInitializer.initialize(routerClass);
-        this.invocationHandler = InvocationHandlerImpl.getInstance();
-        this.pathParameterInvocationHandler = new PrimitivePathParameterInvocationHandler();
     }
 
     @Override
@@ -54,8 +50,7 @@ public class EnjektorServlet extends HttpServlet {
                 .state(methodState)
                 .build();
 
-        final HttpState httpState = endpointManager.process(requestState, HttpMethod.GET);
-        final EndpointState endpointState = httpState.getEndpointState();
+        final EndpointState endpointState = endpointManager.process(requestState);
         endpointState.setRouterObject(routerObject);
 
         // TODO: implement command pattern for method invocation

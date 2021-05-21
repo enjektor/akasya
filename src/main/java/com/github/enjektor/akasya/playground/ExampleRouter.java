@@ -6,11 +6,13 @@ import com.github.enjektor.akasya.annotations.Param;
 import com.github.enjektor.akasya.annotations.Post;
 import com.github.enjektor.akasya.annotations.Query;
 import com.github.enjektor.akasya.annotations.Router;
+import com.github.enjektor.akasya.playground.middleware.BasicAuthenticationMiddleware;
 import com.github.enjektor.core.annotations.Inject;
 import com.github.enjektor.akasya.playground.domain.Human;
 import com.github.enjektor.akasya.playground.injectable.StringRandomizer;
 
-@Router("/v1")
+@Router(value = "/v1",
+        middlewares = {BasicAuthenticationMiddleware.class})
 public class ExampleRouter {
 
     @Inject

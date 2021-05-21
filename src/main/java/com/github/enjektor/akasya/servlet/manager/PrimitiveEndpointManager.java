@@ -19,23 +19,18 @@ public class PrimitiveEndpointManager implements EndpointManager {
     private static final HashProvider hashProvider = ByteHashProvider.getInstance();
 
     @Override
-    public HttpState process(RequestState requestState, HttpMethod httpMethod) {
+    public EndpointState process(RequestState requestState) {
         final HttpServletRequest request = requestState.getRequest();
         final String endpoint = requestPathInformationCollector.collect(request);
         final byte unsignedHashValue = hashProvider.provide(endpoint);
 
         final MethodState states = requestState.getState();
         final TByteObjectMap<Method> methods = states.getMethods();
-
         final Method methodThatWillInvoke = methods.get(unsignedHashValue);
 
         if (methodThatWillInvoke != null) {
-            EndpointState parameterState = new EndpointState.Builder()
+            return new EndpointState.Builder()
                     .method(methodThatWillInvoke)
-                    .build();
-
-            return new HttpState.Builder()
-                    .parameterState(parameterState)
                     .build();
         } else {
             for (PathParameterState state : states.getStates()) {
@@ -46,17 +41,14 @@ public class PrimitiveEndpointManager implements EndpointManager {
                     final byte hashRegex = hashProvider.provide(state.getEndpoint());
                     final Method method = methods.get(hashRegex);
 
-                    final EndpointState parameterState = new EndpointState.Builder()
+                    return new EndpointState.Builder()
                             .method(method)
                             .pattern(pattern)
-                            .build();
-
-                    return new HttpState.Builder()
-                            .parameterState(parameterState)
                             .build();
                 }
             }
         }
+
         return null;
     }
 }
