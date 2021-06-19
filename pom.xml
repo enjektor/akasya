@@ -7,13 +7,13 @@
   <parent>
     <groupId>com.github.enjektor</groupId>
     <artifactId>enjektor</artifactId>
-    <version>0.0.6.RELEASE</version>
+    <version>0.0.6.2</version>
   </parent>
 
-  <artifactId>akasya</artifactId>
+  <artifactId>web</artifactId>
   <version>0.0.1</version>
 
-  <name>akasya</name>
+  <name>web</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -36,7 +36,18 @@
     <dependency>
       <groupId>com.github.enjektor</groupId>
       <artifactId>enjektor-context</artifactId>
-      <version>0.0.6.5</version>
+      <version>0.0.6.8</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.enjektor</groupId>
+      <artifactId>enjektor-epel</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.enjektor</groupId>
+      <artifactId>enjektor-jdbc</artifactId>
+      <version>0.0.2.1</version>
     </dependency>
 
     <dependency>
